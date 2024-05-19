@@ -1,5 +1,9 @@
 const mongoose = require('mongoose');
-const models = [require('./models/item')];
+const models = [
+  require('./models/user'),
+  require('./models/food'),
+  //require('./models/meals')
+];
 
 module.exports = {};
 
