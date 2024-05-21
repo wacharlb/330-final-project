@@ -3,9 +3,17 @@ const FoodDAO = require('./food_dao');
 
 module.exports = {};
 
-module.exports.createOrder = async (mealObj) => {
-  const meal = await Meal.create(mealObj);
-  return meal;
+module.exports.createMeal = async (mealObj) => {
+  console.log("meal_dao, createMeal, called");
+  console.log("meal_dao, createMeal, mealObj:", mealObj);
+  try {
+    const meal = await Meal.create(mealObj);
+    console.log("meal_dao, createMeal, meal:", meal);
+    return meal;
+  } catch(error) {
+    console.error(error);
+    return null;
+  }
 }
 
 module.exports.getMeals = async (userId, roles) => {

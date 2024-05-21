@@ -13,33 +13,65 @@ const router = Router();
 // total fat. The meal should also have the userId of the 
 // user the created the meal.
 router.post("/", isAuthorized, async (req, res, next) => {
-  const foodIdArray = req.body;
+  console.log("meals_router, post /, called");
+  const foods = req.body.foods;
+  const mealType = req.body.mealType;
   const decodedToken = req.decodedToken;
   const email = req.decodedToken.email;
 
+  console.log("meals_router, post /, foods:", foods);
+  console.log("meals_router, post /, mealType:", mealType);
+  console.log("meals_router, post /, decodedToken:", decodedToken);
+  console.log("meals_router, post /, email:", email);
+
   // Get the user by email
   const user = await UserDAO.getUser(email);
+  console.log("meals_router, post /, user:", user);
   if(!user) {
     res.status(400).send("User does not exist");
   }
 
   // verify all items in the array exist
   let totalCalories = 0;
-  for(const foodId of foodIdArray) {
+  let totalCarb = 0;
+  let totalFat = 0;
+  let totalSodium = 0;
+  for(const foodId of foods) {
+    console.log("meals_router, post /, foodId:", foodId);
+
     const food = await FoodDAO.getFood(foodId);
+    console.log("meals_router, post /, food:", food);
+
     if(!food) {
       return res.status(400).send("Item does not exist!");
     } else {
       // Add the price of the item to the total price
       totalCalories = totalCalories + food.calories;
+      totalCarb = totalCarb + food.carbs;
+      totalFat = totalFat + food.fat;
+      totalSodium = totalSodium + food.sodium;
     }
   }
 
+  console.log("meals_router, post /, totalCalories:", totalCalories);
+
   // Create a new order object
-  const mealObj = {userId: user._id, items: foodIdArray, total: totalCalories};
-  const meal = await MealDAO.createOrder(mealObj);
+  const mealObj = {
+    userId: user._id, 
+    foods: foods,
+    mealType: mealType,
+    totalCalories: totalCalories,
+    totalCarb: totalCarb,
+    totalFat: totalFat,
+    totalSodium: totalSodium
+  };
+  console.log("meals_router, post /, mealObj:", mealObj);
+
+  const meal = await MealDAO.createMeal(mealObj);
+  console.log("meals_router, post /, meal:", meal);
+  
   if(!meal) {
-    res.status(400);
+    res.status(400).send("Meal is null!");
   } else {
     res.send(meal);
   }
