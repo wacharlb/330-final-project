@@ -46,10 +46,10 @@ router.post("/", isAuthorized, async (req, res, next) => {
       return res.status(400).send("Item does not exist!");
     } else {
       // Add the price of the item to the total price
-      totalCalories = totalCalories + food.calories;
-      totalCarb = totalCarb + food.carbs;
-      totalFat = totalFat + food.fat;
-      totalSodium = totalSodium + food.sodium;
+      totalCalories = totalCalories + (food.calories * food.servings);
+      totalCarb = totalCarb + (food.carbs * food.servings);
+      totalFat = totalFat + (food.fat * food.servings);
+      totalSodium = totalSodium + (food.sodium * food.servings);
     }
   }
 
@@ -82,10 +82,15 @@ router.post("/", isAuthorized, async (req, res, next) => {
 // making the request if not an admin user. If they are an 
 // admin user it should return all orders in the DB.
 router.get("/", isAuthorized, async (req, res, next) => {
+  console.log("meals_router get /, called");
   const userId = req.decodedToken._id;
   const roles = req.decodedToken.roles;
+  console.log("meals_router get /, userId:", userId);
+  console.log("meals_router get /, roles:", roles);
 
   const meals = await MealDAO.getMeals(userId, roles);
+  console.log("meals_router get /, meals:", meals);
+
   if(!meals) {
     res.status(400).send("No meals found for the given user!");
   } else {
@@ -99,18 +104,25 @@ router.get("/", isAuthorized, async (req, res, next) => {
 // a 404 if they did not create the meal. An admin user 
 // should be able to get any meal for any user.
 router.get("/:id", isAuthorized, async (req, res, next) => {
+  console.log("meals_router, get /:id, called");
   const mealId = req.params.id;
   const decodedToken = req.decodedToken;
   const email = decodedToken.email;
+  console.log("meals_router, get /:id, mealId:", mealId);
+  console.log("meals_router, get /:id, decodedToken:", decodedToken);
+  console.log("meals_router, get /:id, email:", email);
 
   // Get the user id
   const user = await UserDAO.getUser(email);
+  console.log("meals_router, get /:id, user:", user);
   if(!user) {
     return res.status(400).send("User does not exist!");
   }
 
   // Get the order
-  const meal = await MealDAO.getOrder(user, mealId);
+  const meal = await MealDAO.getMeal(user, mealId);
+  console.log("meals_router, get /:id, meal:", meal);
+
   if(!meal) {
     res.status(400).send("Meal does not exist!");
   } else if(user.roles.includes("admin") || user._id.toString() === meal.userId.toString()) {

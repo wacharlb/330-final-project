@@ -10,8 +10,7 @@ module.exports.createMeal = async (mealObj) => {
     const meal = await Meal.create(mealObj);
     console.log("meal_dao, createMeal, meal:", meal);
     return meal;
-  } catch(error) {
-    console.error(error);
+  } catch(error) {    
     return null;
   }
 }

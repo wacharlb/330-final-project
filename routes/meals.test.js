@@ -46,12 +46,6 @@ describe("/meals", () => {
     console.log("meals.test, meal:", meal);
   });
 
-  // let meal = {
-  //   foods: foods.map((i) => i._id),
-  //   mealType: "Snack" 
-  // };
-  
-  // console.log("meals.test, meals:", meal);
   describe("Before login", () => {
     describe("POST /", () => {
       it("should send 401 without a token", async () => {
@@ -134,28 +128,167 @@ describe("/meals", () => {
           totalSodium: 190
         });
       });
-      // it("should send 200 to admin user and create meal with repeat foods", async () => {
-      //   const res = await request(server)
-      //     .post("/foods")
-      //     .set("Authorization", "Bearer " + adminToken)
-      //     .send([foods[1], foods[1], foods[0]].map((i) => i._id));
-      //   expect(res.statusCode).toEqual(200);
-      //   const storedMeal = await Meal.findOne().lean();
-      //   expect(storedMeal).toMatchObject({
-      //     foods: [foods[1]._id, foods[1]._id, foods[0]._id],
-      //     userId: (await User.findOne({ email: user1.email }))._id,
-      //     total: 34,
-      //   });
-      // });
-      // it("should send 400 with a bad item _id", async () => {
-      //   const res = await request(server)
-      //     .post("/orders")
-      //     .set("Authorization", "Bearer " + adminToken)
-      //     .send([items[1], "5f1b8d9ca0ef055e6e5a1f6b"].map((i) => i._id));
-      //   expect(res.statusCode).toEqual(400);
-      //   const storedOrder = await Order.findOne().lean();
-      //   expect(storedOrder).toBeNull();
-      // });
+      it("should send 200 to admin user and create meal with repeat foods", async () => {
+        let mealRepeatedFood = {foods: [foods[1], foods[1], foods[0]].map((i) => i._id), mealType: "Snack"};
+        console.log("meals.test, mealRepeatedFood:", mealRepeatedFood);
+        const res = await request(server)
+          .post("/meals")
+          .set("Authorization", "Bearer " + adminToken)
+          .send({foods: [foods[1], foods[1], foods[0]].map((i) => i._id), mealType: "Snack"});
+        expect(res.statusCode).toEqual(200);
+        const storedMeal = await Meal.findOne().lean();
+        expect(storedMeal).toMatchObject({
+          foods: [foods[1]._id, foods[1]._id, foods[0]._id],
+          mealType: "Snack",
+          userId: (await User.findOne({ email: user1.email }))._id,
+          totalCalories: 760,
+          totalCarb: 84,
+          totalFat: 45,
+          totalSodium: 330,
+        });
+      });
+      it("should send 400 with a bad item _id", async () => {
+        const res = await request(server)
+          .post("/meals")
+          .set("Authorization", "Bearer " + adminToken)
+          .send({foods: [foods[1], "5f1b8d9ca0ef055e6e5a1f6b"].map((i) => i._id), mealType: "Snack"});
+        expect(res.statusCode).toEqual(400);
+        const storedMeal = await Meal.findOne().lean();
+        expect(storedMeal).toBeNull();
+      });
     });
+    describe("GET /:id", () => {
+      let order0Id, order1Id;
+      beforeEach(async () => {
+        const res0 = await request(server)
+          .post("/meals")
+          .set("Authorization", "Bearer " + token0)
+          .send({foods: [foods[0], foods[1], foods[1]].map((i) => i._id), mealType: "Snack"});
+        meal0Id = res0.body._id;
+        const res1 = await request(server)
+          .post("/meals")
+          .set("Authorization", "Bearer " + adminToken)
+          .send({foods: [foods[1]].map((i) => i._id), mealType: "Snack"});
+        meal1Id = res1.body._id;
+      });
+      it("should send 200 to normal user with their meal", async () => {
+        const res = await request(server)
+          .get("/meals/" + meal0Id)
+          .set("Authorization", "Bearer " + token0)
+          .send();
+        console.log("meal.test, GET /:id, res.body:", res.body);
+        expect(res.statusCode).toEqual(200);
+        expect(res.body).toMatchObject({
+          foods: [food0, food1, food1],
+          mealType: "Snack",
+          userId: (await User.findOne({ email: user0.email }))._id.toString(),
+          totalCalories: 760,
+          totalCarb: 84,
+          totalFat: 45,
+          totalSodium: 330
+        });
+      });
+      it("should send 404 to normal user with someone else's meal", async () => {
+        const res = await request(server)
+          .get("/meals/" + meal1Id)
+          .set("Authorization", "Bearer " + token0)
+          .send();
+        expect(res.statusCode).toEqual(404);
+      });
+      it("should send 200 to admin user with their meal", async () => {
+        const res = await request(server)
+          .get("/meals/" + meal1Id)
+          .set("Authorization", "Bearer " + adminToken)
+          .send();
+        expect(res.statusCode).toEqual(200);
+        console.log("meal.test, GET /:id, res.body:", res.body);
+        expect(res.body).toMatchObject({
+          foods: [food1],
+          mealType: "Snack",
+          userId: (await User.findOne({ email: user1.email }))._id.toString(),
+          totalCalories: 280,
+          totalFat: 12,
+          totalCarb: 40,
+          totalSodium: 140
+        });
+      });
+      it("should send 200 to admin user with someone else's meal", async () => {
+        const res = await request(server)
+          .get("/meals/" + meal0Id)
+          .set("Authorization", "Bearer " + adminToken)
+          .send();
+        expect(res.statusCode).toEqual(200);
+        expect(res.body).toMatchObject({
+          foods: [food0, food1, food1],
+          mealType: "Snack",
+          userId: (await User.findOne({ email: user0.email }))._id.toString(),
+          totalCalories: 760,
+          totalCarb: 84,
+          totalFat: 45,
+          totalSodium: 330
+        });
+      });
+    });
+    describe("GET /", () => {
+      let meal0Id, meal1Id;
+      beforeEach(async () => {
+        const res0 = await request(server)
+          .post("/meals")
+          .set("Authorization", "Bearer " + token0)
+          .send({foods: foods.map((i) => i._id), mealType: "Snack"});
+        meal0Id = res0.body._id;
+        const res1 = await request(server)
+          .post("/meals")
+          .set("Authorization", "Bearer " + adminToken)
+          .send({foods: [foods[1]].map((i) => i._id), mealType: "Snack"});
+        meal1Id = res1.body._id;
+      });
+      it("should send 200 to normal user with their one meal", async () => {
+        const res = await request(server)
+          .get("/meals")
+          .set("Authorization", "Bearer " + token0)
+          .send();
+        expect(res.statusCode).toEqual(200);
+        expect(res.body).toMatchObject([
+          {
+            foods: [foods[0]._id.toString(), foods[1]._id.toString()],
+            mealType: "Snack",
+            userId: (await User.findOne({ email: user0.email }))._id.toString(),
+            totalCalories: 480,
+            totalCarb: 44,
+            totalFat: 33,
+            totalSodium: 190
+          },
+        ]);
+      });
+      it("should send 200 to admin user all meals", async () => {
+        const res = await request(server)
+          .get("/meals")
+          .set("Authorization", "Bearer " + adminToken)
+          .send();
+        expect(res.statusCode).toEqual(200);
+        console.log("meals.test, GET /, res.body:", res.body);
+        expect(res.body).toMatchObject([
+          {
+            foods: [foods[0]._id.toString(), foods[1]._id.toString()],
+            mealType: "Snack",
+            userId: (await User.findOne({ email: user0.email }))._id.toString(),
+            totalCalories: 480,
+            totalCarb: 44,
+            totalFat: 33,
+            totalSodium: 190
+          },
+          {
+            foods: [foods[1]._id.toString()],
+            mealType: "Snack",
+            userId: (await User.findOne({ email: user1.email }))._id.toString(),
+            totalCalories: 280,
+            totalCarb: 40,
+            totalFat: 12,
+            totalSodium: 140
+          },
+        ]);
+      });
+    })
   });
 });
