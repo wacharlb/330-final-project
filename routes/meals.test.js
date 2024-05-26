@@ -45,7 +45,6 @@ describe("/meals", () => {
     }
     console.log("meals.test, meal:", meal);
   });
-
   describe("Before login", () => {
     describe("POST /", () => {
       it("should send 401 without a token", async () => {
@@ -102,6 +101,7 @@ describe("/meals", () => {
       await request(server).post("/auth/signup").send(user0);
       const res0 = await request(server).post("/auth/login").send(user0);
       token0 = res0.body.token;
+      
       await request(server).post("/auth/signup").send(user1);
       await User.updateOne(
         { email: user1.email },
@@ -289,6 +289,92 @@ describe("/meals", () => {
           },
         ]);
       });
-    })
+    });
+    describe("GET /stats", () => {
+      let meal0, meal1, meal2;
+      let meal0Id, meal1Id, meal2Id;
+
+      beforeEach(async () => {
+        const res0 = await request(server)
+          .post("/meals")
+          .set("Authorization", "Bearer " + token0)
+          .send({foods: foods.map((i) => i._id), mealType: "Breakfast"});
+        meal0 = res0.body;
+        meal0Id = res0.body._id;
+        const res1 = await request(server)
+        .post("/meals")
+        .set("Authorization", "Bearer " + token0)
+        .send({foods: [foods[1]].map((i) => i._id), mealType: "Lunch"});
+        meal1 = res1.body;
+        meal1Id = res1.body._id;
+        const res2 = await request(server)
+        .post("/meals")
+        .set("Authorization", "Bearer " + token0)
+        .send({foods: foods.map((i) => i._id), mealType: "Dinner"});
+        meal2 = res2.body;
+        meal2Id = res2.body._id;
+      });
+      it("should return something???", async () => {
+        const res = await request(server)
+          .get("/meals/stats")
+          .set("Authorization", "Bearer " + token0)
+          .send({ mealIds: [meal0Id, meal1Id, meal2Id] });
+        const receivedResponse = res.body;
+        const expectedResponse = {
+          meals: [meal0Id, meal1Id, meal2Id],
+          totalMealPlanCalories: 1240,
+          totalMealPlanCarb: 128,
+          totalMealPlanFat: 78,
+          totalMealPlanSodium: 520
+        }
+        expect(receivedResponse).toMatchObject(expectedResponse);
+      });
+    });
+    describe("DELETE /", () => {
+      let meal0Id, meal1Id, meal2Id;
+      beforeEach(async () => {
+        const res0 = await request(server)
+          .post("/meals")
+          .set("Authorization", "Bearer " + token0)
+          .send({foods: foods.map((i) => i._id), mealType: "Snack"});
+        meal0Id = res0.body._id;
+        const res1 = await request(server)
+          .post("/meals")
+          .set("Authorization", "Bearer " + token0)
+          .send({foods: [foods[1]].map((i) => i._id), mealType: "Snack"});
+        meal1Id = res1.body._id;
+        const res2 = await request(server)
+        .post("/meals")
+        .set("Authorization", "Bearer " + adminToken)
+        .send({foods: [foods[1]].map((i) => i._id), mealType: "Snack"});
+        meal2Id = res1.body._id;
+      });
+      it("should send 200 to an admin user and delete all meals for all users", async () => {
+        const res = await request(server)
+          .delete("/meals")
+          .set("Authorization", "Bearer " + adminToken)
+          .send();
+        expect(res.statusCode).toEqual(200);
+        const meals = await Meal.find({});
+        console.log("meals.test, DELETE /, admin, meals:", meals);
+        expect(meals).toEqual([]);
+      });
+      it("should send 200 to a normal user and delete all of their meals", async () => {
+        const res = await request(server)
+          .delete("/meals")
+          .set("Authorization", "Bearer " + token0)
+          .send();
+        expect(res.statusCode).toEqual(200);
+        const user = await User.findOne({email: user0.email});
+        const userId = user._id;
+        const meals = await Meal.find({userId: userId});
+        console.log("meals.test, DELETE /, user0, meals:", meals);
+        expect(meals).toEqual([]);
+        const adminUser = await User.findOne({email: user1.email});
+        const adminUserId = adminUser._id;
+        const adminMeals = await Meal.find({userId: adminUserId});
+        expect(adminMeals).not.toEqual([]);
+      });
+    });
   });
 });

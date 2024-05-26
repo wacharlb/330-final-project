@@ -5,12 +5,14 @@ const mealSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "users",
     required: true,
+    index: true
   },
   mealType: { type: String, required: true },
   totalCalories: { type: String, required: true },
   foods: { 
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: "foods" }],
     required: true,
+    index: true
   },
   totalCalories: { type: Number, required: true },
   totalFat: { type: Number, require: false },

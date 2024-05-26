@@ -98,6 +98,25 @@ router.get("/", isAuthorized, async (req, res, next) => {
   }
 });
 
+router.get("/stats", isAuthorized, async (req, res, next) => {
+  console.log("meals_router, get /stats, called");
+  const mealIds = req.body.mealIds;
+  
+  console.log("meals_router, get /stats, req.body:", req.body);
+  console.log("meals_router, get /stats, mealsIds:", mealIds);
+  const email = req.decodedToken.email;
+  console.log("meals_router, get /stats, email:", email);
+  
+  // Get the user id
+  const user = await UserDAO.getUser(email);
+  console.log("meals_router, get /:id, user:", user);
+  if(!user) {
+    return res.status(400).send("User does not exist!");
+  }
+  const mealsStats = await MealDAO.getStats(user._id, mealIds);
+  res.json(mealsStats);
+});
+
 // Get an meal: GET /meals/:id -  return an meal with 
 // the foods array containing the full food objects rather 
 // than just their _id. If the user is a normal user return
@@ -129,6 +148,26 @@ router.get("/:id", isAuthorized, async (req, res, next) => {
     res.send(meal);
   } else {
     res.status(404).send("User not authorized!");
+  }
+});
+
+// DELETE /meals - deletes all meals made by a user making the
+// request if not an admin user. If they are an admin user it
+// should delete all meals in the DB.
+router.delete("/", isAuthorized, async (req, res, next) => {
+  console.log("meals_router, delete /, called");
+  const userId = req.decodedToken._id;
+  const roles = req.decodedToken.roles;
+  console.log("meals_router, delete /, userId:", userId);
+  console.log("meals_router, delete /, roles:", roles);
+
+  try {
+    const success = await MealDAO.deleteAll(userId, roles);
+    console.log("meals_router, delete /, success:", success);
+
+    res.sendStatus(success ? 200 : 400);
+  } catch(e) {
+    res.status(500).send(e.message);
   }
 });
 

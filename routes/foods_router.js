@@ -1,17 +1,7 @@
 const { Router } = require("express");
-const { isAuthorized } = require("./auth_router");
+const { isAuthorized, isAdmin } = require("./auth_router");
 const FoodDAO = require("../daos/food_dao");
 const router = Router();
-
-// const isAdmin = async (req, res, next) => {
-//   const decodedToken = req.decodedToken;
-
-//   if(decodedToken.roles.includes('admin')) {
-//     next();
-//   } else {
-//     res.status(403).send("Forbidden: You are not authorized to access this resource!");
-//   }
-// }
 
 router.post("/", isAuthorized, async(req, res, next) => {
   console.log("foods_router, post /, called");
@@ -62,5 +52,32 @@ router.put("/:id", isAuthorized, async (req, res, next) => {
     res.send(food);
   }
 });
+
+router.delete("/", isAuthorized, isAdmin, async (req, res, next) => {
+  console.log("food_router, Delete, called");
+  try {
+    const success = await FoodDAO.deleteAll();
+    res.sendStatus(success ? 200 : 400);
+  } catch(e) {
+    res.status(500).send(e.message);
+  }
+});
+
+// Delete a food.
+router.delete("/:id", isAuthorized, async (req, res, next) => {
+  console.log("food_router, Delete /:id, called");
+  const foodId = req.params.id;
+  console.log("food_router, Delete /:id, foodId", foodId);
+
+  try {
+    const success = await FoodDAO.deleteById(foodId);
+    console.log("food_router, Delete /:id, success", success);
+
+    res.sendStatus(success ? 200 : 400);
+  } catch(e) {
+    res.status(500).send(e.message);
+  }
+});
+
 
 module.exports = router;

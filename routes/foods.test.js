@@ -266,5 +266,73 @@ describe("/foods", () => {
         expect(res.body).toMatchObject(insertedFoods);
       });
     });
+    describe("DELETE /", () => {
+      beforeEach(async () => {
+        insertedFoods = (await Food.insertMany([food0, food1])).map((i) => i.toJSON());
+        insertedFoods.forEach((i) => (i._id = i._id.toString()));
+      });
+      it("should reject a delete from normal unathorized user", async () => {
+        console.log("foods.test, delete / test called");
+        const res = await request(server)
+          .delete("/foods/")
+          .set("Authorization", "Bearer " + token0)
+          .send({});
+        expect(res.statusCode).toEqual(403);
+      });
+      it("should delete all foods from an admin authorized user", async () => {
+        console.log("foods.test, delete / test called");
+        const res = await request(server)
+          .delete("/foods/")
+          .set("Authorization", "Bearer " + adminToken)
+          .send({});
+        expect(res.statusCode).toEqual(200);
+      });
+    });
+    describe("DELETE /:id", () => {
+      beforeEach(async () => {
+        insertedFoods = (await Food.insertMany([food0, food1])).map((i) => i.toJSON());
+        insertedFoods.forEach((i) => (i._id = i._id.toString()));
+      }); 
+      it("should reject a bad id for a normal user", async () => {
+        const res = await request(server)
+          .delete("/foods/fake")
+          .set("Authorization", "Bearer " + token0)
+          .send();
+        expect(res.statusCode).toEqual(400);
+      });
+      it("should delete the expected food for a normal user", async () => {
+        const storedFoods = await Food.find({}).lean();
+        console.log("food.test, delete /:id, foods", storedFoods);
+        const storedFood1Id = storedFoods[0]._id;
+        console.log("food.test, delete /:id, food1Id:", storedFood1Id);
+        const res = await request(server)
+          .delete("/foods/" + storedFood1Id)
+          .set("Authorization", "Bearer " + adminToken)
+          .send({});
+        expect(res.statusCode).toEqual(200);
+        const storedFood = await Food.findOne({ storedFood1Id });
+        expect(storedFood).toBeNull();
+      });
+      it("should reject a bad id for a admin user", async () => {
+        const res = await request(server)
+          .delete("/foods/fake")
+          .set("Authorization", "Bearer " + adminToken)
+          .send();
+        expect(res.statusCode).toEqual(400);
+      });
+      it("should delete the expected food for a admin user", async () => {
+        const storedFoods = await Food.find({}).lean();
+        console.log("food.test, delete /:id, foods", storedFoods);
+        const storedFood1Id = storedFoods[0]._id;
+        console.log("food.test, delete /:id, food1Id:", storedFood1Id);
+        const res = await request(server)
+          .delete("/foods/" + storedFood1Id)
+          .set("Authorization", "Bearer " + adminToken)
+          .send({});
+        expect(res.statusCode).toEqual(200);
+        const storedFood = await Food.findOne({ storedFood1Id });
+        expect(storedFood).toBeNull();
+      });
+    });
   });
 })

@@ -30,6 +30,18 @@ const isAuthorized = async (req, res, next) => {
   }
 }
 
+const isAdmin = async (req, res, next) => {
+  console.log("auth_router, isAdmin, called");
+  const decodedToken = req.decodedToken;
+
+  if(decodedToken.roles.includes('admin')) {
+    next();
+  } else {
+    console.log("auth_router, isAdmin, else 403");
+    res.status(403).send("Forbidden: You are not authorized to access this resource!");
+  }
+}
+
 // Signups POST /auth/signup
 router.post("/signup", async(req, res, next) =>{
   console.log("auth_router post /signup, called");
@@ -141,5 +153,6 @@ router.post("/logout", (req, res, next) => {
 
 module.exports = {
   router,
-  isAuthorized
+  isAuthorized,
+  isAdmin
 };
