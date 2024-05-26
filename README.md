@@ -1,3 +1,41 @@
+Proof of Concept Update:
+Date: 05-26-2024
+
+1.  Completed Project Tasks:
+
+    Models:
+
+        - Completed user model
+        - Completed food model
+        - Completed meal model
+
+    DAO Functions:
+
+        - Completed user DAO functions
+        - Completed food DAO functions
+        - Completed meal DAO functions
+
+    Router Functions:
+
+        - Completed auth router functions
+        - Completed food router functions
+        - Completed meal router functions
+        - Complete authentication and authorization middleware functions
+
+    Unit tests:
+
+        - Complete auth unit tests, all tests passing
+        - Complete food unit tests, all tests passing
+        - Complete meal unit tests, all tests passing
+
+2.  Remaining Tasks:
+
+    - Implement Postman route tests for demonstration
+    - Github CI/CD, actions
+    - Setup railway hosting
+    - Setup Atlas hosting
+    - Presentation slide show and demo presentation preparation
+
 - Title: Nutrify: Revolutionizing Meal Tracking and Planning with Express API
 
 - Scenario:
