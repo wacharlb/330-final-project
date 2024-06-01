@@ -19,6 +19,7 @@ describe("/foods", () => {
     servingSizeUnits: "ounces",
     servings: 1,
     carbs: 4,
+    protein: 10,
     fat: 21,
     sodium: 50
   };
@@ -29,6 +30,7 @@ describe("/foods", () => {
     servingSizeUnits: "cakes",
     servings: 1,
     carbs: 40,
+    protein: 8,
     fat: 12,
     sodium: 140
   };
@@ -168,6 +170,7 @@ describe("/foods", () => {
           servingSizeUnits: "cakes",
           servings: 1,
           carbs: 44,
+          protein: 5,
           fat: 10,
           sodium: 110
         }

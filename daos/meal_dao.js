@@ -99,6 +99,7 @@ module.exports.getStats = async (userId, mealIds) => {
         totalMealPlanCalories: { $sum: '$totalCalories' },
         totalMealPlanFat: { $sum: '$totalFat' },
         totalMealPlanCarb: { $sum: '$totalCarb' },
+        totalMealPlanProtein: { $sum: '$totalProtein' },
         totalMealPlanSodium: { $sum: '$totalSodium' }
       }
     },
@@ -109,6 +110,7 @@ module.exports.getStats = async (userId, mealIds) => {
         totalMealPlanCalories: 1,
         totalMealPlanFat: 1,
         totalMealPlanCarb: 1,
+        totalMealPlanProtein: 1,
         totalMealPlanSodium: 1
       }
     }

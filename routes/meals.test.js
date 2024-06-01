@@ -20,6 +20,7 @@ describe("/meals", () => {
     servingSizeUnits: "ounces",
     servings: 1,
     carbs: 4,
+    protein: 20,
     fat: 21,
     sodium: 50
   };
@@ -30,6 +31,7 @@ describe("/meals", () => {
     servingSizeUnits: "cakes",
     servings: 1,
     carbs: 40,
+    protein: 10,
     fat: 12,
     sodium: 140
   };
@@ -124,6 +126,7 @@ describe("/meals", () => {
           userId: (await User.findOne({ email: user0.email }).lean())._id,
           totalCalories: 480,
           totalCarb: 44,
+          totalProtein: 30,
           totalFat: 33,
           totalSodium: 190
         });
@@ -143,6 +146,7 @@ describe("/meals", () => {
           userId: (await User.findOne({ email: user1.email }))._id,
           totalCalories: 760,
           totalCarb: 84,
+          totalProtein: 40,
           totalFat: 45,
           totalSodium: 330,
         });
@@ -184,6 +188,7 @@ describe("/meals", () => {
           userId: (await User.findOne({ email: user0.email }))._id.toString(),
           totalCalories: 760,
           totalCarb: 84,
+          totalProtein: 40,
           totalFat: 45,
           totalSodium: 330
         });
@@ -209,6 +214,7 @@ describe("/meals", () => {
           totalCalories: 280,
           totalFat: 12,
           totalCarb: 40,
+          totalProtein: 10,
           totalSodium: 140
         });
       });
@@ -225,6 +231,7 @@ describe("/meals", () => {
           totalCalories: 760,
           totalCarb: 84,
           totalFat: 45,
+          totalProtein: 40,
           totalSodium: 330
         });
       });
@@ -257,6 +264,7 @@ describe("/meals", () => {
             totalCalories: 480,
             totalCarb: 44,
             totalFat: 33,
+            totalProtein: 30,
             totalSodium: 190
           },
         ]);
@@ -275,6 +283,7 @@ describe("/meals", () => {
             userId: (await User.findOne({ email: user0.email }))._id.toString(),
             totalCalories: 480,
             totalCarb: 44,
+            totalProtein: 30,
             totalFat: 33,
             totalSodium: 190
           },
@@ -284,6 +293,7 @@ describe("/meals", () => {
             userId: (await User.findOne({ email: user1.email }))._id.toString(),
             totalCalories: 280,
             totalCarb: 40,
+            totalProtein: 10,
             totalFat: 12,
             totalSodium: 140
           },
@@ -324,6 +334,7 @@ describe("/meals", () => {
           meals: [meal0Id, meal1Id, meal2Id],
           totalMealPlanCalories: 1240,
           totalMealPlanCarb: 128,
+          totalMealPlanProtein: 70,
           totalMealPlanFat: 78,
           totalMealPlanSodium: 520
         }

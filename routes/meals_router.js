@@ -34,6 +34,7 @@ router.post("/", isAuthorized, async (req, res, next) => {
   // verify all items in the array exist
   let totalCalories = 0;
   let totalCarb = 0;
+  let totalProtein = 0;
   let totalFat = 0;
   let totalSodium = 0;
   for(const foodId of foods) {
@@ -48,6 +49,7 @@ router.post("/", isAuthorized, async (req, res, next) => {
       // Add the price of the item to the total price
       totalCalories = totalCalories + (food.calories * food.servings);
       totalCarb = totalCarb + (food.carbs * food.servings);
+      totalProtein = totalProtein + (food.protein * food.servings);
       totalFat = totalFat + (food.fat * food.servings);
       totalSodium = totalSodium + (food.sodium * food.servings);
     }
@@ -62,6 +64,7 @@ router.post("/", isAuthorized, async (req, res, next) => {
     mealType: mealType,
     totalCalories: totalCalories,
     totalCarb: totalCarb,
+    totalProtein: totalProtein,
     totalFat: totalFat,
     totalSodium: totalSodium
   };

@@ -40,6 +40,7 @@ module.exports.updateFood = async (foodId, foodObj) => {
       servingSizeUnits: foodObj.servingSizeUnits,
       servings: foodObj.servings,
       carbs: foodObj.carbs,
+      protein: foodObj.protein,
       fat: foodObj.fat,
       sodium: foodObj.sodium
     },

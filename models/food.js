@@ -7,6 +7,7 @@ const foodSchema = new mongoose.Schema({
   servingSizeUnits: { type: String, require: true },
   servings: {type: Number, required: true },
   carbs: { type: Number, required: false },
+  protein: { type: Number, require: false },
   fat: { type: Number, required: true },
   sodium: { type: Number, required: false}
 });
