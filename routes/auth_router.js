@@ -47,7 +47,7 @@ router.post("/signup", async(req, res, next) =>{
   console.log("auth_router post /signup, called");
   const email = req.body.email;
   const password = req.body.password;
-  const roles = req.body.roles;
+  let roles = req.body.roles;
 
   if(!req.body.roles) {
     roles = ["user"];
