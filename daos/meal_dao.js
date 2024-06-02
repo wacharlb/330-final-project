@@ -17,11 +17,16 @@ module.exports.createMeal = async (mealObj) => {
 }
 
 module.exports.getMeals = async (userId, roles) => {
+  console.log("meal_dao, getMeals, called");
+  console.log("meal_dao, getMeals, userId:", userId);
+  console.log("meal_dao, getMeals, roles:", roles);
   try {
     if(roles.includes("admin")) {
+      console.log("meal_dao, getMeals, isAdmin");
       const meals = await Meal.find({}).lean();
       return meals;
     } else if(roles.includes("user")) {
+      console.log("meal_dao, getMeals, isUser");
       const meals = await Meal.find({ userId: userId });
       return meals;
     }
