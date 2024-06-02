@@ -47,6 +47,11 @@ router.post("/signup", async(req, res, next) =>{
   console.log("auth_router post /signup, called");
   const email = req.body.email;
   const password = req.body.password;
+  const roles = req.body.roles;
+
+  if(!req.body.roles) {
+    roles = ["user"];
+  }
 
   console.log("auth_router post /signup, email:", email);
   console.log("auth_router post /signup, password:", password);
@@ -68,7 +73,7 @@ router.post("/signup", async(req, res, next) =>{
       return res.status(409).send("User email already exist!");
     }
 
-    const user = await UserDAO.createUser({email: email, password: encryptedPassword, roles: ["user"]});
+    const user = await UserDAO.createUser({email: email, password: encryptedPassword, roles: roles});
     console.log("auth_router post /signup, user:", user);
     if(!user) {
       res.status(400).send("User is null");
