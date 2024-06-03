@@ -21,15 +21,26 @@ module.exports.getMeals = async (userId, roles) => {
   console.log("meal_dao, getMeals, userId:", userId);
   console.log("meal_dao, getMeals, roles:", roles);
   try {
+    let meals = null;
     if(roles.includes("admin")) {
       console.log("meal_dao, getMeals, isAdmin");
-      const meals = await Meal.find({}).lean();
-      return meals;
+      meals = await Meal.find({}).lean(); 
+      // return meals;
     } else if(roles.includes("user")) {
       console.log("meal_dao, getMeals, isUser");
-      const meals = await Meal.find({ userId: userId });
-      return meals;
+      meals = await Meal.find({ userId: userId });
+      // return meals;
     }
+    // Fully populate the foods array
+    for(const meal of meals) {
+      let foodsArray = [];
+      for(const foodId of meal.foods) {
+        const food = await FoodDAO.getFood(foodId);
+        foodsArray.push(food);
+      }
+      meal.foods = foodsArray;
+    }
+    return meals;
   } catch {
     return null;
   }
