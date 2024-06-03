@@ -153,3 +153,15 @@ module.exports.deleteAll = async (userId, roles) => {
     return false;
   }
 }
+
+module.exports.delete = async (userId, mealId) => {
+  console.log("meal_dao delete, called:");
+  try{
+    const meals = await Meal.deleteOne({userId: userId, mealId: mealId});
+    console.log("meal_dao, delete, user, meals:", meals);
+    return true
+  } catch(error) {
+    console.error("food_dao deleteAll, error:", error);
+    return false;
+  }
+}

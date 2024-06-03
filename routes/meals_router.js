@@ -174,4 +174,26 @@ router.delete("/", isAuthorized, async (req, res, next) => {
   }
 });
 
+// DELETE /meals - deletes all meals made by a user making the
+// request if not an admin user. If they are an admin user it
+// should delete all meals in the DB.
+router.delete("/:id", isAuthorized, async (req, res, next) => {
+  console.log("meals_router, delete /:id, called");
+  const userId = req.decodedToken._id;
+  // const roles = req.decodedToken.roles;
+  const mealId = req.params.id;
+  console.log("meals_router, delete /:id, userId:", userId);
+  // console.log("meals_router, delete /:id, roles:", roles);
+  console.log("meals_router, delete /:id, mealId:", mealId);
+
+  try {
+    const success = await MealDAO.delete(userId, mealId);
+    console.log("meals_router, delete /:id, success:", success);
+
+    res.sendStatus(success ? 200 : 400);
+  } catch(e) {
+    res.status(500).send(e.message);
+  }
+});
+
 module.exports = router;

@@ -412,5 +412,35 @@ describe("/meals", () => {
         expect(adminMeals).not.toEqual([]);
       });
     });
+    describe("DELETE /:id", () => {
+      let meal0Id, meal1Id, meal2Id;
+      beforeEach(async () => {
+        const res0 = await request(server)
+          .post("/meals")
+          .set("Authorization", "Bearer " + token0)
+          .send({foods: foods.map((i) => i._id), mealType: "Snack"});
+        meal0Id = res0.body._id;
+        const res1 = await request(server)
+          .post("/meals")
+          .set("Authorization", "Bearer " + token0)
+          .send({foods: [foods[1]].map((i) => i._id), mealType: "Snack"});
+        meal1Id = res1.body._id;
+        const res2 = await request(server)
+        .post("/meals")
+        .set("Authorization", "Bearer " + adminToken)
+        .send({foods: [foods[1]].map((i) => i._id), mealType: "Snack"});
+        meal2Id = res1.body._id;
+      });
+      it("should send 200 to user and delete meal0 for current user", async () => {
+        const res = await request(server)
+          .delete("/meals/" + meal0Id)
+          .set("Authorization", "Bearer " + adminToken)
+          .send();
+        expect(res.statusCode).toEqual(200);
+        const meal = await Meal.findOne({mealId: meal0Id});
+        console.log("meals.test, DELETE /:id, user, meals:", meal);
+        expect(meal).toEqual(null);
+      });
+    });
   });
 });
