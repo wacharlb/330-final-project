@@ -16,10 +16,8 @@ module.exports.createUser = async (userObj) => {
 
 // Get a user record using their email
 module.exports.getUser = async (email) => {
-  console.log("user_dao getUser, called");
   try {
     const user = await User.findOne({ email: email});
-    console.log("user_dao getUser, user:", user);
     return user;
   } catch {
     return null;
@@ -30,7 +28,6 @@ module.exports.getUser = async (email) => {
 module.exports.updateUserPassword = async (userId, password) => {
   // create a new encrypted password;
   const newEncryptedPassword = await bcrypt.hash(password, 8);
-
   try {
     const user = await User.findOneAndUpdate(
       { _id: userId }, 

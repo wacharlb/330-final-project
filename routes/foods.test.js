@@ -125,8 +125,6 @@ describe("/foods", () => {
 
         // Count the number of food items after this request
         const foodCount = await Food.countDocuments();
-        console.log("Food.countDocuments(): ", foodCount);
-
         expect(foodCount).toEqual(1);
       });
       it("should send 200 to admin user and store food", async () => {
@@ -135,8 +133,6 @@ describe("/foods", () => {
           .set("Authorization", "Bearer " + adminToken)
           .send(food);
         expect(res.statusCode).toEqual(200);
-        console.log("food:", food);
-        console.log("res.body:", res.body);
         expect(res.body).toMatchObject(food);
         const savedFood = await Food.findOne({ _id: res.body._id }).lean();
         expect(savedFood).toMatchObject(food);
@@ -182,9 +178,6 @@ describe("/foods", () => {
         expect(res.statusCode).toEqual(200);
         const newFood = await Food.findById(originalFood._id).lean();
         newFood._id = newFood._id.toString();
-        console.log("newFood:", newFood);
-        console.log("updatedFood:", updatedFood);
-
         expect(newFood).toMatchObject(updatedFood);
       });
       it("should send 200 to admin user and update food", async () => {
@@ -251,7 +244,6 @@ describe("/foods", () => {
         insertedFoods.forEach((i) => (i._id = i._id.toString()));
       }); 
       it("should send 200 to normal user and return all foods", async () => {
-        console.log("insertedFood:", insertedFoods);
         const res = await request(server)
           .get("/foods/")
           .set("Authorization", "Bearer " + token0)
@@ -265,8 +257,6 @@ describe("/foods", () => {
           .set("Authorization", "Bearer " + adminToken)
           .send();
         expect(res.statusCode).toEqual(200);
-        console.log("res.body:", res.body);
-        console.log("insertedFoods:", insertedFoods);
         expect(res.body).toMatchObject(insertedFoods);
       });
     });
@@ -276,7 +266,6 @@ describe("/foods", () => {
         insertedFoods.forEach((i) => (i._id = i._id.toString()));
       });
       it("should reject a delete from normal unathorized user", async () => {
-        console.log("foods.test, delete / test called");
         const res = await request(server)
           .delete("/foods/")
           .set("Authorization", "Bearer " + token0)
@@ -284,7 +273,6 @@ describe("/foods", () => {
         expect(res.statusCode).toEqual(403);
       });
       it("should delete all foods from an admin authorized user", async () => {
-        console.log("foods.test, delete / test called");
         const res = await request(server)
           .delete("/foods/")
           .set("Authorization", "Bearer " + adminToken)
@@ -306,9 +294,7 @@ describe("/foods", () => {
       });
       it("should delete the expected food for a normal user", async () => {
         const storedFoods = await Food.find({}).lean();
-        console.log("food.test, delete /:id, foods", storedFoods);
         const storedFood1Id = storedFoods[0]._id;
-        console.log("food.test, delete /:id, food1Id:", storedFood1Id);
         const res = await request(server)
           .delete("/foods/" + storedFood1Id)
           .set("Authorization", "Bearer " + adminToken)
@@ -326,9 +312,7 @@ describe("/foods", () => {
       });
       it("should delete the expected food for a admin user", async () => {
         const storedFoods = await Food.find({}).lean();
-        console.log("food.test, delete /:id, foods", storedFoods);
         const storedFood1Id = storedFoods[0]._id;
-        console.log("food.test, delete /:id, food1Id:", storedFood1Id);
         const res = await request(server)
           .delete("/foods/" + storedFood1Id)
           .set("Authorization", "Bearer " + adminToken)

@@ -40,12 +40,10 @@ describe("/meals", () => {
   let meal;
   beforeEach(async () => {
     foods = (await Food.insertMany([food0, food1])).map((i) => i.toJSON());  
-    console.log("meals.test, foods:", foods);
     meal = {
       foods: foods.map((i) => i._id.toString()),
       mealType: "Snack" 
     }
-    console.log("meals.test, meal:", meal);
   });
   describe("Before login", () => {
     describe("POST /", () => {
@@ -133,7 +131,6 @@ describe("/meals", () => {
       });
       it("should send 200 to admin user and create meal with repeat foods", async () => {
         let mealRepeatedFood = {foods: [foods[1], foods[1], foods[0]].map((i) => i._id), mealType: "Snack"};
-        console.log("meals.test, mealRepeatedFood:", mealRepeatedFood);
         const res = await request(server)
           .post("/meals")
           .set("Authorization", "Bearer " + adminToken)
@@ -180,7 +177,6 @@ describe("/meals", () => {
           .get("/meals/" + meal0Id)
           .set("Authorization", "Bearer " + token0)
           .send();
-        console.log("meal.test, GET /:id, res.body:", res.body);
         expect(res.statusCode).toEqual(200);
         expect(res.body).toMatchObject({
           foods: [food0, food1, food1],
@@ -206,7 +202,6 @@ describe("/meals", () => {
           .set("Authorization", "Bearer " + adminToken)
           .send();
         expect(res.statusCode).toEqual(200);
-        console.log("meal.test, GET /:id, res.body:", res.body);
         expect(res.body).toMatchObject({
           foods: [food1],
           mealType: "Snack",
@@ -283,17 +278,12 @@ describe("/meals", () => {
           .set("Authorization", "Bearer " + adminToken)
           .send();
         expect(res.statusCode).toEqual(200);
-        console.log("meals.test, GET /, res.body:", res.body);
         const food0 = await Food.findOne({_id: foods[0]._id}).lean();
         const food1 = await Food.findOne({_id: foods[1]._id}).lean();
 
         // Convert the food _id's to strings
         food0._id = food0._id.toString();
         food1._id = food1._id.toString();
-
-        console.log("meal test, res.body:", res.body);
-        console.log("meal test, food0:", food0);
-        console.log("meal test, food1:", food1);
 
         const user_0 = await User.findOne({ email: user0.email });
         const user_1 = await User.findOne({ email: user1.email });
@@ -392,7 +382,6 @@ describe("/meals", () => {
           .send();
         expect(res.statusCode).toEqual(200);
         const meals = await Meal.find({});
-        console.log("meals.test, DELETE /, admin, meals:", meals);
         expect(meals).toEqual([]);
       });
       it("should send 200 to a normal user and delete all of their meals", async () => {
@@ -404,7 +393,6 @@ describe("/meals", () => {
         const user = await User.findOne({email: user0.email});
         const userId = user._id;
         const meals = await Meal.find({userId: userId});
-        console.log("meals.test, DELETE /, user0, meals:", meals);
         expect(meals).toEqual([]);
         const adminUser = await User.findOne({email: user1.email});
         const adminUserId = adminUser._id;
@@ -438,7 +426,6 @@ describe("/meals", () => {
           .send();
         expect(res.statusCode).toEqual(200);
         const meal = await Meal.findOne({mealId: meal0Id});
-        console.log("meals.test, DELETE /:id, user, meals:", meal);
         expect(meal).toEqual(null);
       });
     });

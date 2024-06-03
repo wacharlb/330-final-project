@@ -29,8 +29,6 @@ module.exports.getFood = async (foodId) => {
 
 // Update the user's password field
 module.exports.updateFood = async (foodId, foodObj) => {
-  console.log("food_dao updateFood, foodId HHHHHH:", foodId);
-  console.log("food_dao updateFood, foodObj:", foodObj);
   const food = await Food.findOneAndUpdate(
     { _id: foodId},
     { 
@@ -46,13 +44,10 @@ module.exports.updateFood = async (foodId, foodObj) => {
     },
     { new: true }
   ).lean();
-  console.log("food_dao updateFood, food:", food);
-
   return food;
 }
 
 module.exports.deleteAll = async () => {
-  console.log("food_dao deleteAll, called:");
   try{  
     await Food.deleteMany({});
     return true;
@@ -63,19 +58,11 @@ module.exports.deleteAll = async () => {
 }
 
 module.exports.deleteById = async (foodId) => {
-  console.log("food_dao deleteById, called:");
-  console.log("food_dao deleteById, foodId:", foodId);
-
   try{
     if (!mongoose.Types.ObjectId.isValid(foodId)) {
-      console.log("food_dao deleteById, isValue:", false);
       return false;
     }
-
-    console.log("food_dao deleteById, isValue:", true);
     await Food.deleteOne({ _id: foodId });
-    console.log("food_dao deleteOne:");
-
     return true;
   } catch(error) {
     console.error("food_dao deleteById, error:", error);

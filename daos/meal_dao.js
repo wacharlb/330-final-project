@@ -5,11 +5,8 @@ const mongoose = require('mongoose');
 module.exports = {};
 
 module.exports.createMeal = async (mealObj) => {
-  console.log("meal_dao, createMeal, called");
-  console.log("meal_dao, createMeal, mealObj:", mealObj);
   try {
     const meal = await Meal.create(mealObj);
-    console.log("meal_dao, createMeal, meal:", meal);
     return meal;
   } catch(error) {    
     return null;
@@ -17,17 +14,12 @@ module.exports.createMeal = async (mealObj) => {
 }
 
 module.exports.getMeals = async (userId, roles) => {
-  console.log("meal_dao, getMeals, called");
-  console.log("meal_dao, getMeals, userId:", userId);
-  console.log("meal_dao, getMeals, roles:", roles);
   try {
     let meals = null;
     if(roles.includes("admin")) {
-      console.log("meal_dao, getMeals, isAdmin");
       meals = await Meal.find({}).lean(); 
       // return meals;
     } else if(roles.includes("user")) {
-      console.log("meal_dao, getMeals, isUser");
       meals = await Meal.find({ userId: userId });
       // return meals;
     }
@@ -63,16 +55,7 @@ module.exports.getMeal = async (user, mealId) => {
 }
 
 module.exports.getStats = async (userId, mealIds) => {
-  console.log("meal_dao, getStats, called");
-  console.log("meal_dao, getStats, mealIds:", mealIds);
-  console.log("meal_dao, getStats, userId:", userId);
-  
   const meals = await Meal.find({userId: userId});
-  console.log("meal_dao, getStats, meals:", meals);
-
-  console.log("meal_dao, getStats, userId good!");
-  
-  // const mealObjectIds = mealIds.map(id => new mongoose.Types.ObjectId(id)); // Use 'new'
 
   // Validate and convert meal IDs to ObjectIds
   const mealObjectIds = mealIds.map(id => {
@@ -84,7 +67,7 @@ module.exports.getStats = async (userId, mealIds) => {
   });
 
   const mealsStats = await Meal.aggregate([
-    { 
+    {
       $match: {
         _id: { $in: mealObjectIds },
         userId:  new mongoose.Types.ObjectId(userId)
@@ -131,21 +114,16 @@ module.exports.getStats = async (userId, mealIds) => {
       }
     }
   ]);
-  console.log("meal_dao, getStats, mealsStats", JSON.stringify(mealsStats, null, 2));
   return mealsStats[0];
 }
 
-
 module.exports.deleteAll = async (userId, roles) => {
-  console.log("meal_dao deleteAll, called:");
   try{  
     if(roles.includes("admin")) {
       const meals = await Meal.deleteMany({});
-      console.log("meal_dao, deleteAll, admin user, meals:", meals);
       return true;
     } else if(roles.includes("user")) {
       const meals = await Meal.deleteMany({ userId: userId });
-      console.log("meal_dao, deleteAll, normal user, meals:", meals);
       return true;
     }
   } catch(error) {
@@ -155,10 +133,8 @@ module.exports.deleteAll = async (userId, roles) => {
 }
 
 module.exports.delete = async (userId, mealId) => {
-  console.log("meal_dao delete, called:");
   try{
     const meals = await Meal.deleteOne({userId: userId, mealId: mealId});
-    console.log("meal_dao, delete, user, meals:", meals);
     return true
   } catch(error) {
     console.error("food_dao deleteAll, error:", error);
