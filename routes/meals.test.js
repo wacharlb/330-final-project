@@ -256,9 +256,17 @@ describe("/meals", () => {
           .set("Authorization", "Bearer " + token0)
           .send();
         expect(res.statusCode).toEqual(200);
+        const food0 = await Food.findOne({_id: foods[0]._id}).lean();
+        const food1 = await Food.findOne({_id: foods[1]._id}).lean();
+
+        // Convert the food _id's to strings
+        food0._id = food0._id.toString();
+        food1._id = food1._id.toString();
+
         expect(res.body).toMatchObject([
           {
-            foods: [foods[0]._id.toString(), foods[1]._id.toString()],
+            // foods: [foods[0]._id.toString(), foods[1]._id.toString()],
+            foods: [food0, food1],
             mealType: "Snack",
             userId: (await User.findOne({ email: user0.email }))._id.toString(),
             totalCalories: 480,
@@ -276,11 +284,26 @@ describe("/meals", () => {
           .send();
         expect(res.statusCode).toEqual(200);
         console.log("meals.test, GET /, res.body:", res.body);
-        expect(res.body).toMatchObject([
+        const food0 = await Food.findOne({_id: foods[0]._id}).lean();
+        const food1 = await Food.findOne({_id: foods[1]._id}).lean();
+
+        // Convert the food _id's to strings
+        food0._id = food0._id.toString();
+        food1._id = food1._id.toString();
+
+        console.log("meal test, res.body:", res.body);
+        console.log("meal test, food0:", food0);
+        console.log("meal test, food1:", food1);
+
+        const user_0 = await User.findOne({ email: user0.email });
+        const user_1 = await User.findOne({ email: user1.email });
+
+        // Construct expected objects
+        const expectedMeals = [
           {
-            foods: [foods[0]._id.toString(), foods[1]._id.toString()],
+            foods: [food0, food1],
             mealType: "Snack",
-            userId: (await User.findOne({ email: user0.email }))._id.toString(),
+            userId: user_0._id.toString(),
             totalCalories: 480,
             totalCarb: 44,
             totalProtein: 30,
@@ -288,16 +311,18 @@ describe("/meals", () => {
             totalSodium: 190
           },
           {
-            foods: [foods[1]._id.toString()],
+            foods: [food1],
             mealType: "Snack",
-            userId: (await User.findOne({ email: user1.email }))._id.toString(),
+            userId: user_1._id.toString(),
             totalCalories: 280,
             totalCarb: 40,
             totalProtein: 10,
             totalFat: 12,
             totalSodium: 140
-          },
-        ]);
+          }
+        ];
+        // Compare received and expected objects
+        expect(res.body).toMatchObject(expectedMeals);
       });
     });
     describe("GET /stats", () => {

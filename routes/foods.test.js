@@ -195,6 +195,7 @@ describe("/foods", () => {
           servingSizeUnits: "cakes",
           servings: 1,
           carbs: 44,
+          protein: 5,
           fat: 10,
           sodium: 110
         }
