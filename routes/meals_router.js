@@ -148,17 +148,17 @@ router.delete("/:id", isAuthorized, async (req, res, next) => {
   console.log("meals_router, delete/:id, mealId", mealId);
   console.log("meals_router, delete/:id, email", email);
 
- // Get the user by email
- const user = await UserDAO.getUser(email);
- console.log("meals_router, delete/:id, user", user);
- console.log("meals_router, delete/:id, user._id", user._id);
+  // Get the user by email
+  const user = await UserDAO.getUser(email);
+  console.log("meals_router, delete/:id, user", user);
+  console.log("meals_router, delete/:id, user._id", user._id);
 
- if(!user) {
-   res.status(400).send("User does not exist");
- }
+  if(!user) {
+    res.status(400).send("User does not exist");
+  }
 
   try {
-    const success = await MealDAO.delete(userId, mealId);
+    const success = await MealDAO.delete(user._id, mealId);
     res.sendStatus(success ? 200 : 400);
   } catch(e) {
     res.status(500).send(e.message);
