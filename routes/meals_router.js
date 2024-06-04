@@ -142,10 +142,17 @@ router.delete("/", isAuthorized, async (req, res, next) => {
 // should delete all meals in the DB.
 router.delete("/:id", isAuthorized, async (req, res, next) => {
   const userId = req.decodedToken._id;
-  const mealId = req.params.id;
+  //const mealId = req.params.id;
+  const email = req.decodedToken.email;
+
+  // Get the user by email
+  const user = await UserDAO.getUser(email);
+  if(!user) {
+    res.status(400).send("User does not exist");
+  }
 
   try {
-    const success = await MealDAO.delete(userId, mealId);
+    const success = await MealDAO.delete(user._id, mealId);
     res.sendStatus(success ? 200 : 400);
   } catch(e) {
     res.status(500).send(e.message);
