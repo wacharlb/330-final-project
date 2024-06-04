@@ -134,7 +134,7 @@ module.exports.deleteAll = async (userId, roles) => {
 
 module.exports.delete = async (userId, mealId) => {
   try{
-    const meals = await Meal.deleteOne({userId: userId, mealId: mealId});
+    const meals = await Meal.deleteOne({userId: userId, _id: mealId});
     return true
   } catch(error) {
     console.error("food_dao deleteAll, error:", error);
