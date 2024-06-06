@@ -73,23 +73,6 @@ module.exports.getStats = async (userId, mealIds) => {
         userId:  new mongoose.Types.ObjectId(userId)
       }
     },
-    // {
-    //   $lookup: {
-    //     from: 'foods', // The name of the food collection
-    //     localField: 'foods',
-    //     foreignField: '_id',
-    //     as: 'foods'
-    //   }
-    // },
-
-    // {
-    //   $lookup: {
-    //     from: 'meals',
-    //     localField: '_id',
-    //     foreignField: '_id',
-    //     as: 'meals'
-    //   }
-    // },
     {
       $group: {
         _id: null,
